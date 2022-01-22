@@ -1,0 +1,43 @@
+body {
+    display: flex;
+    background-color: darkslategray;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.topArea {
+    display:flex;
+}
+
+main {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gameArea {
+    display:flex;
+    height: 606px;
+    width: 606px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    flex-wrap: wrap;
+
+}
+
+.square{
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    width: 200px;
+    height:200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tic {
+    margin: 0;
+    font-size: 100px;
+}
