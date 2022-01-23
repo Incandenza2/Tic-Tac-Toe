@@ -1,18 +1,81 @@
 body {
     display: flex;
     background-color: darkslategray;
-    flex-direction: column;
     justify-content: center;
+
 }
 
-.topArea {
+.scoreboard {
+    margin: 32px;
     display:flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    max-width: 150px;
+    height: 606px;
+    justify-content: space-evenly;
+}
+
+.nameTag {
+    font-size: 30px;
+    word-break: break-word;
+    text-overflow: wrap;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.scoreValue {
+    margin-top: -60px;
+    font-size: 130px;
 }
 
 main {
     display:flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 600px;
+}
+
+.gameSelect, .nameSelect {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 60px;
+    align-content: center;
+    width: 600px;
+    height: 600px;
+}
+
+.input {
+    background-color: darkslategray;
+    border-color:rgb(80, 133, 133);
+    border-style: solid;
+    max-width: 300px;
+    align-self:center;
+    text-align: center;
+    height: 30px;
+    font-size: 24px;
+}
+
+.prompt {
+    margin: 0;
+    font-size: 24px;
+    align-self: center;
+}
+
+.choice {
+    border-style: none;
+    background-color: rgb(80, 133, 133);
+    font-size: 24px;
+    font-weight: bolder;
+    transition: transform 0.5s;
+    padding: 32px;
+
+}
+
+.choice:hover {
+    transform: scale(1.05);
 }
 
 .gameArea {
@@ -21,14 +84,15 @@ main {
     width: 606px;
     border-style: solid;
     border-width: 1px;
-    border-color: white;
+    border-color: rgb(161, 161, 161);
     flex-wrap: wrap;
 
 }
 
+
 .square{
     border-style: solid;
-    border-color: white;
+    border-color: rgb(161, 161, 161);
     border-width: 1px;
     width: 200px;
     height:200px;
@@ -40,4 +104,10 @@ main {
 .tic {
     margin: 0;
     font-size: 100px;
+}
+
+.log{
+    font-size: 20px;
+    text-overflow: normal;
+    text-align: center;
 }
