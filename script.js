@@ -11,7 +11,6 @@ const board = (() => {
         square.appendChild(tic)
     };
     let startPvpGame = () => {
-        let gameStatus = "active"
         main.replaceChildren("");
         let gameArea = document.createElement("div");
         gameArea.classList.add("gameArea");
@@ -67,7 +66,89 @@ const board = (() => {
         if (Math.random() >= (1/2)) {var turn = 1} else {var turn = 0};
         renewSquareStatus(turn);
     };
-    return {startPvpGame, main};
+    let startPveGame = () => { //game against computer, must add a turn based system
+            let gameStatus = "pve";
+            main.replaceChildren("");
+            let gameArea = document.createElement("div");
+            gameArea.classList.add("gameArea");
+            main.appendChild(gameArea);
+            let log = document.createElement("p")
+            log.classList.add("log");
+            main.appendChild(log);
+            let gameBoard = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+            let renewSquareStatus = (turn) => {
+                    console.log(turn);
+                    if (turn === "end") {
+                        scoreMethods.updateScore();
+                        if (gameStatus !== "pve") {setTimeout(function() {board.startPvpGame()}, 5000);
+                        } else {setTimeout(function() {board.startPveGame()}, 5000);
+                        };
+                    };
+                    if (turn !== "end") {log.textContent = `It is ${players[turn].playerName}'s turn.`};
+                    gameArea.replaceChildren("");
+                    gameBoard.forEach((e, index) => {
+                        let square = document.createElement("div");
+                        square.classList.add("square");
+                        gameArea.appendChild(square);
+                            if (turn === "end") { //draws the final board when the game is over
+                                if (gameBoard[index] === "x") {
+                                    _addTic("×", square);
+                                } else if (gameBoard[index] === ("o")) {
+                                    _addTic("○", square);
+                                } else {return};
+                            } else if ((gameBoard[index] === 0) && (isPlayerTurn === true)){ //lets the player pick a square on his turn
+                                square.addEventListener("click", () => {
+                                    if (turn === 0) {
+                                        gameBoard[index] = "x";
+                                        if (gameLogic.evaluateResult(gameBoard) == "over") {
+                                            _addTic("×", square);
+                                            return renewSquareStatus("end");
+                                        } else {
+                                        isPlayerTurn = false;
+                                        renewSquareStatus(1);
+                                        };
+                                    } else if (turn === 1) {
+                                        gameBoard[index] = ("o");
+                                        if (gameLogic.evaluateResult(gameBoard) == "over") {
+                                            _addTic("○", square);
+                                            return renewSquareStatus("end");
+                                        } else {
+                                        isPlayerTurn = false;
+                                        renewSquareStatus(0);
+                                        };
+                                    };
+                                });
+                            } else if (gameBoard[index] === "x") { //these just draw the already picked squares during the game
+                                _addTic("×", square);
+                            } else if (gameBoard[index] === ("o")) {
+                                _addTic("○", square);
+                            };
+                    });
+                    /* inserting the check for the computer's play here*/
+                    if ((isPlayerTurn === false) && (turn !== "end")) {
+                        console.log("Ok, first this one:" + gameBoard);
+                        let newBoard = computerThinking.computePlay(gameBoard, turn);
+                        console.log("Then this one: " + newBoard)
+                        gameBoard = newBoard;
+                        setTimeout(() => {    
+                            if (gameLogic.evaluateResult(gameBoard) == "over") {
+                                renewSquareStatus("end");
+                            } else {
+                                isPlayerTurn = true;
+                                if (turn === 0) {renewSquareStatus(1);
+                                } else if (turn === 1) {
+                                renewSquareStatus(0);
+                                }
+                            }
+                        }, 2000);
+                        
+                    }   
+            };
+        if (Math.random() >= (1/2)) {var turn = 1; var isPlayerTurn = false} else {var turn = 0; var isPlayerTurn = true}
+        renewSquareStatus(turn);
+
+    }
+    return {startPvpGame, startPveGame, main};
 })();
 
 
@@ -136,7 +217,8 @@ const playerNaming = (player, gameType) => {
             } else if (gameType === "pve") {
                 const computer = Object.create(playerFactory("Computer"));
                 players.push(computer);
-                startPveGame
+                board.startPveGame();
+                scoreMethods.initiateScore();
 
 
             }
@@ -171,6 +253,35 @@ const gameLogic = (() => {
         } else {return};
     };
     return{evaluateResult}
+})();
+
+const computerThinking = (() => {
+    let computePlay = (gameBoard, turn) => {
+        let correctTic;
+        let pick;
+        let finalElement;
+        if (turn === 0) {correctTic = "x"} else if (turn === 1) {correctTic = "o"};
+        let freeSquares = gameBoard.filter((value) => {return value === 0}).length;
+        let randomNum = Math.random();
+        for (let i = 1; i <= freeSquares; i++) {
+            if (randomNum < (i / freeSquares)) {pick = i; break}
+        };
+        let count = 0
+        console.log("are we still cool here?");
+        let elementCount = 0
+        gameBoard.forEach((value) => {
+            elementCount += 1
+            if (value === 0) {
+                count += 1;
+                if (count === pick) {return finalElement = (elementCount - 1);} else {return count};
+            };
+        });
+        gameBoard[finalElement] = correctTic;
+        return gameBoard;
+
+        
+    };
+    return {computePlay};
 })();
 
 const scoreMethods = (() => {
