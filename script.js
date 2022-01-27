@@ -172,7 +172,7 @@ const mainMenu = () => {
         let typeChoice = document.createElement("button");
         typeChoice.classList.add("choice");
         if (i === 0) {typeChoice.textContent = "Player vs Player (you and your friend)"}
-        else if (i === 1) {typeChoice.textContent = "Player vs Computer (unavailable)"};
+        else if (i === 1) {typeChoice.textContent = "Player vs Computer"};
         gameSelect.appendChild(typeChoice);
         typeChoice.addEventListener("click", () => {
             if (i === 0) {
@@ -252,32 +252,83 @@ const gameLogic = (() => {
             //declare draw
         } else {return};
     };
-    return{evaluateResult}
+    const evaluateFuture = (g) => {
+        if ((("x" === g[0]) && ("x" === g[1]) && ("x" === g[2])) || (("x" === g[3]) && ("x" === g[4]) && ("x" === g[5])) || (("x" === g[6]) && ("x" === g[7]) && ("x" === g[8])) || (("x" === g[0]) && ("x" === g[3]) && ("x" === g[6])) || (("x" === g[1]) && ("x" === g[4]) && ("x" === g[7])) || (("x" === g[2]) && ("x" === g[5]) && ("x" === g[8])) || (("x" === g[0]) && ("x" === g[4]) && ("x" === g[8])) || (("x" === g[2]) && ("x" === g[4]) && ("x" === g[6]))) {
+            return "over"
+            //player 1 wins
+        } else if ((("o" === g[0]) && ("o" === g[1]) && ("o" === g[2])) || (("o" === g[3]) && ("o" === g[4]) && ("o" === g[5])) || (("o" === g[6]) && ("o" === g[7]) && ("o" === g[8])) || (("o" === g[0]) && ("o" === g[3]) && ("o" === g[6])) || (("o" === g[1]) && ("o" === g[4]) && ("o" === g[7])) || (("o" === g[2]) && ("o" === g[5]) && ("o" === g[8])) || (("o" === g[0]) && ("o" === g[4]) && ("o" === g[8])) || (("o" === g[2]) && ("o" === g[4]) && ("o" === g[6]))) {
+            return "over"
+            //player 2 wins
+        } else if ((g[0] && g[1] && g[2] && g[3] && g[4] && g[5] && g[6] && g[7] && g[8]) !== 0) {
+            return "over"
+            //declare draw
+        } else {return};
+    };
+    return{evaluateResult, evaluateFuture}
 })();
 
 const computerThinking = (() => {
-    let computePlay = (gameBoard, turn) => {
+    let computePlay =(gameBoard, turn) => {
         let correctTic;
-        let pick;
-        let finalElement;
-        if (turn === 0) {correctTic = "x"} else if (turn === 1) {correctTic = "o"};
-        let freeSquares = gameBoard.filter((value) => {return value === 0}).length;
-        let randomNum = Math.random();
-        for (let i = 1; i <= freeSquares; i++) {
-            if (randomNum < (i / freeSquares)) {pick = i; break}
+        let playerTic;
+        let foundAnswer = false
+        let evaluationBoard = gameBoard
+        if (turn === 0) {
+            correctTic = "x"; 
+            playerTic = "o";
+            var specificCase = [0, 0, 0, 0, "o", 0, 0, 0, 0];
+        } else if (turn === 1) {
+            correctTic = "o"; 
+            playerTic = "x";
+            var specificCase = [0, 0, 0, 0, "x", 0, 0, 0, 0];
         };
-        let count = 0
-        console.log("are we still cool here?");
-        let elementCount = 0
-        gameBoard.forEach((value) => {
-            elementCount += 1
+        if (gameBoard.toString() === [0,0,0,0,0,0,0,0,0].toString()) {gameBoard[4] = correctTic; foundAnswer = true;};
+        if (foundAnswer === true) {return gameBoard} else if (specificCase.toString() === gameBoard.toString()) {
+            gameBoard[2] = correctTic;
+            foundAnswer = true;
+        };
+        if (foundAnswer === true) {return gameBoard} else {    
+            evaluationBoard.forEach((value, index) => {
+                if (value === 0) {
+                    evaluationBoard[index] = correctTic
+                    if ((gameLogic.evaluateFuture(evaluationBoard) === "over") && (foundAnswer === false)) {
+                        gameBoard[index] = correctTic;
+                        foundAnswer = true;
+                    } else {evaluationBoard[index] = 0};
+                };
+        })};
+        if (foundAnswer === true) {return gameBoard} else {
+            evaluationBoard.forEach((value, index) => {
             if (value === 0) {
-                count += 1;
-                if (count === pick) {return finalElement = (elementCount - 1);} else {return count};
+                evaluationBoard[index] = playerTic
+                if ((gameLogic.evaluateFuture(evaluationBoard) === "over") && (foundAnswer === false)) {
+                    gameBoard[index] = correctTic;
+                    foundAnswer = true;
+                } else {evaluationBoard[index] = 0};
             };
-        });
-        gameBoard[finalElement] = correctTic;
-        return gameBoard;
+            })};
+        if (foundAnswer === true) {return gameBoard} else {
+            let pick;
+            let finalElement;
+            if (turn === 0) {correctTic = "x"} else if (turn === 1) {correctTic = "o"};
+                let freeSquares = gameBoard.filter((value) => {return value === 0}).length;
+                let randomNum = Math.random();
+                for (let i = 1; i <= freeSquares; i++) {
+                    if (randomNum < (i / freeSquares)) {pick = i; break}
+                };
+            let count = 0
+            console.log("are we still cool here?");
+            let elementCount = 0
+            gameBoard.forEach((value) => {
+                elementCount += 1
+                if (value === 0) {
+                    count += 1;
+                    if (count === pick) {return finalElement = (elementCount - 1);} else {return count};
+                };
+            });
+            gameBoard[finalElement] = correctTic;
+            return gameBoard;
+        };
 
         
     };
